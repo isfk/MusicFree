@@ -20,7 +20,7 @@ partial class PlayViewModel
         _hasPlayer = false;
 
         NowMusicName = "";
-        PlayBtnText = "▶️";
+        PlayBtnImg = "play_fill.png";
         IsPlaying = false;
         MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
 
@@ -50,7 +50,7 @@ partial class PlayViewModel
     private string _nowMusicName;
 
     [ObservableProperty] private string _musicPath;
-    [ObservableProperty] private string _playBtnText;
+    [ObservableProperty] private string _playBtnImg;
     [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] List<LocalMusic> _localMusics;
 
@@ -84,7 +84,7 @@ partial class PlayViewModel
             }
             if (!_hasPlayer)
             {
-                _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{LocalMusics[0].Name}"));
+                _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{LocalMusics[0].Name}.mp3"));
                 _hasPlayer = true;
                 NowMusicName = LocalMusics[0].Name;
             }
@@ -92,13 +92,13 @@ partial class PlayViewModel
             if (_audioPlayer.IsPlaying)
             {
                 _audioPlayer.Pause();
-                PlayBtnText = "▶️";
+                PlayBtnImg = "play_fill.png";
             }
             else
             {
                 Debug.WriteLine("playing...");
                 _audioPlayer.Play();
-                PlayBtnText = "⏸️";
+                PlayBtnImg = "stop.png";
             }
         }
         else
@@ -121,7 +121,7 @@ partial class PlayViewModel
             NowMusicName = musicName;
             Debug.WriteLine("playing...");
             _audioPlayer.Play();
-            PlayBtnText = "⏸️";
+            PlayBtnImg = "stop.png";
         }
 
         IsPlaying = !IsPlaying;

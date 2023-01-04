@@ -8,29 +8,27 @@
     <ContentPage.BindingContext>
         <viewmodel:PlayViewModel />
     </ContentPage.BindingContext>
-    <toolkit:DockLayout>
+    <toolkit:DockLayout Padding="10">
         <Grid ColumnDefinitions="*,*,*" RowDefinitions="*, *" toolkit:DockLayout.DockPosition="Bottom" HeightRequest="100">
             <Label Text="{Binding NowMusicNameText}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="AliceBlue"/>
-            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏪️" Grid.Row="1" Grid.Column="0"></Button>
-            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏩️" Grid.Row="1" Grid.Column="2"></Button>
-            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="{Binding PlayBtnText}"
-                    Command="{Binding PlayCommand}"  Grid.Row="1" Grid.Column="1">
-            </Button>
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="0" Source="backward_fill.png" Aspect="AspectFit" />
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit" />
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="1" Source="{Binding PlayBtnImg}" Aspect="AspectFit" Command="{Binding PlayCommand}" />
         </Grid>
-         
         <CollectionView ItemsSource="{Binding LocalMusics}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10"
-                          Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
+                        Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
-                                                  CommandParameter="{x:Binding Name}"/>
+                                                CommandParameter="{x:Binding Name}"/>
                         </Grid.GestureRecognizers>
                         <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
-                     </Grid>
-                 </DataTemplate>
-             </CollectionView.ItemTemplate>
-         </CollectionView>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </toolkit:DockLayout>
+    
 </ContentPage>
