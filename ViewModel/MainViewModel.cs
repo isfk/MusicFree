@@ -7,7 +7,10 @@ using MusicFree.Model;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+
+#if ANDROID
 using Android;
+#endif
 
 namespace MusicFree.ViewModel
 {
@@ -25,21 +28,25 @@ namespace MusicFree.ViewModel
             CanDownload = true;
             ShowLoading = false;
             ShowMusics = false;
+            ShowFolder = false;
 
             Musics = new ObservableCollection<Music>();
             MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
 
-            if (DeviceInfo.Current.Platform == DevicePlatform.Android)
+#if ANDROID
+            MusicPath = $"{Android.OS.Environment.ExternalStorageDirectory.AbsolutePath}/Music/";
+#endif
+
+            if (DevicePlatform.WinUI == DeviceInfo.Current.Platform)
             {
-                MusicPath = $"{Android.OS.Environment.ExternalStorageDirectory.AbsolutePath}/Music/";
-            }
-            else
-            {
-                MusicPath = $"{Environment.GetFolderPath(System.Environment.SpecialFolder.MyMusic)}/";
+                ShowFolder = true;
             }
         }
 
         public string MusicPathText => $"下载路径：{MusicPath}";
+
+        [ObservableProperty]
+        bool showFolder;
 
         [ObservableProperty]
         string musicName;
@@ -159,5 +166,11 @@ namespace MusicFree.ViewModel
             CanDownload = true;
         }
 
+        [RelayCommand]
+        async void OpenFolder()
+        {
+            Process.Start("explorer.exe", MusicPath);
+            await Task.Delay(1000);
+        }
     }
 }

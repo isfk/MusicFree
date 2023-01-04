@@ -15,7 +15,7 @@
 		<ApplicationTitle>MusicFree</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.musicfree</ApplicationId>
+		<ApplicationId>cn.com.isfk.freemusic</ApplicationId>
 		<ApplicationIdGuid>cf2a3557-ea11-4d05-8dad-c5c7ea8e6317</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -42,10 +42,12 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
 	  <ApplicationId>cn.com.isfk.freemusic</ApplicationId>
+	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
 	  <ApplicationId>cn.com.isfk.freemusic</ApplicationId>
+	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
@@ -74,9 +76,6 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-
-		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->

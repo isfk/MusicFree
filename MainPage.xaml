@@ -12,15 +12,18 @@
             Spacing="20"
             Padding="10"
             VerticalOptions="StartAndExpand">
-            <Label Text="{Binding MusicPathText}" />
-            <Entry Text="{Binding MusicName}" HeightRequest="60" FontSize="18" Placeholder="歌名/歌手名" BackgroundColor="AliceBlue" ClearButtonVisibility="WhileEditing"/>
+            <HorizontalStackLayout HorizontalOptions="FillAndExpand">
+                <Label Text="{Binding MusicPathText}" FontSize="{OnPlatform MacCatalyst='18', WinUI='18', Default='14'}" />
+                <Button IsVisible="{OnPlatform WinUI='ShowFolder', Default='false'}" Text="打开" Command="{Binding OpenFolderCommand}" />
+            </HorizontalStackLayout>
+            <Entry Text="{Binding MusicName}" HeightRequest="60" FontSize="{OnPlatform MacCatalyst='20', WinUI='20', Default='18'}" Placeholder="歌名/歌手名" BackgroundColor="AliceBlue" ClearButtonVisibility="WhileEditing"/>
             <Button Text="{Binding SearchBtnText}" FontSize="18" Command="{Binding SearchCommand}" />
             <ActivityIndicator IsRunning="True" IsVisible="{Binding ShowLoading}"/>
 
             <CollectionView IsVisible="{Binding ShowMusics}" ItemsSource="{Binding Musics}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Music">
-                        <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10" Padding="10" RowSpacing="10">
+                        <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 20" Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
