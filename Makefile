@@ -1,5 +1,5 @@
 ﻿.PHONY: build_andorid
-build_andorid:
+build_android:
 	dotnet build -f:net7.0-android -c:release /p:CreatePackage=true
 
 .PHONY: build_mac
