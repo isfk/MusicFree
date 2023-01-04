@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MusicFree.MainPage"
@@ -12,18 +13,18 @@
             Spacing="20"
             Padding="10"
             VerticalOptions="StartAndExpand">
-            <HorizontalStackLayout HorizontalOptions="FillAndExpand">
-                <Label Text="{Binding MusicPathText}" FontSize="{OnPlatform MacCatalyst='18', WinUI='18', Default='14'}" />
-                <Button IsVisible="{OnPlatform WinUI='ShowFolder', Default='false'}" Text="打开" Command="{Binding OpenFolderCommand}" />
-            </HorizontalStackLayout>
-            <Entry Text="{Binding MusicName}" HeightRequest="60" FontSize="{OnPlatform MacCatalyst='20', WinUI='20', Default='18'}" Placeholder="歌名/歌手名" BackgroundColor="AliceBlue" ClearButtonVisibility="WhileEditing"/>
+            <Label Text="{Binding MusicPathText}" FontSize="{OnPlatform MacCatalyst='18', WinUI='18', Default='14'}" />
+            <Entry Text="{Binding MusicName}" HeightRequest="60"
+                   FontSize="{OnPlatform MacCatalyst='20', WinUI='20', Default='18'}" Placeholder="歌名/歌手名"
+                   BackgroundColor="AliceBlue" ClearButtonVisibility="WhileEditing" />
             <Button Text="{Binding SearchBtnText}" FontSize="18" Command="{Binding SearchCommand}" />
-            <ActivityIndicator IsRunning="True" IsVisible="{Binding ShowLoading}"/>
+            <ActivityIndicator IsRunning="True" IsVisible="{Binding ShowLoading}" />
 
             <CollectionView IsVisible="{Binding ShowMusics}" ItemsSource="{Binding Musics}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Music">
-                        <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 20" Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
+                        <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 20"
+                              Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
@@ -33,13 +34,14 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
-                            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
-                                <Label Text="{x:Binding Artist[0]}"/>
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Label Text="{x:Binding Artist[0]}" />
                                 <Label Text=" - " />
-                                <Label Text="{x:Binding Album.Name}" Grid.Row="1" Grid.Column="1" />
+                                <Label Text="{x:Binding Album.Name}" />
                             </HorizontalStackLayout>
 
-                            <HorizontalStackLayout Grid.Row="0" Grid.Column="1"  Grid.RowSpan="2" HorizontalOptions="End">
+                            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                   HorizontalOptions="End">
                                 <Button Text="下载" WidthRequest="60"
                                         IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=CanDownload}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=DownloadCommand}"
