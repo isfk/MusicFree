@@ -45,7 +45,7 @@ namespace MusicFree.ViewModel
         [ObservableProperty] string _musicName;
 
         [ObservableProperty] [NotifyPropertyChangedFor(nameof(MusicPathText))]
-        string musicPath;
+        string _musicPath;
 
         [ObservableProperty] string _searchBtnText;
 
