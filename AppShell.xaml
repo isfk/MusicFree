@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <Shell
     x:Class="MusicFree.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -6,9 +7,14 @@
     xmlns:local="clr-namespace:MusicFree"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="免费音乐"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-
+    <FlyoutItem>
+        <ShellContent
+            Title="播放"
+            ContentTemplate="{DataTemplate local:PlayPage}"
+            Route="PlayPage" />
+        <ShellContent
+            Title="下载"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
 </Shell>

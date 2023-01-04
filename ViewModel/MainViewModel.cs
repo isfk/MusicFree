@@ -6,6 +6,7 @@ using MusicFree.Model;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using CommunityToolkit.Maui.Core;
 
 #if ANDROID
 using Android;
@@ -32,10 +33,11 @@ namespace MusicFree.ViewModel
             ShowMusics = false;
 
             Musics = new ObservableCollection<Music>();
-            MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
+            // MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
+            MusicPath = $"{FileSystem.Current.AppDataDirectory}/";
 
 #if ANDROID
-            MusicPath = $"{Android.OS.Environment.ExternalStorageDirectory.AbsolutePath}/Music/";
+            // MusicPath = $"{FileSystem.Current.AppDataDirectory}/";
 #endif
         }
 
@@ -116,6 +118,17 @@ namespace MusicFree.ViewModel
                 return;
             }
 
+            var srcPath = MusicPath + music.Artist[0] + "-" + music.Name + ".mp3";
+            Debug.WriteLine(srcPath);
+
+            if (File.Exists(srcPath))
+            {
+                CancellationTokenSource cancellationTokenSource = new();
+                var toast = Toast.Make("音乐已存在");
+                await toast.Show(cancellationTokenSource.Token);
+                return;
+            }
+
             CanDownload = false;
 
             // 准备请求
@@ -128,17 +141,20 @@ namespace MusicFree.ViewModel
             {
                 try
                 {
-                    var srcPath = MusicPath + music.Artist[0] + "-" + music.Name + ".mp3";
-                    Debug.WriteLine(srcPath);
                     using HttpResponseMessage srcResp = await request.GetData(detail.Src);
                     await using var srcFs = File.Open(srcPath, FileMode.Create);
                     await using var srcMs = await srcResp.Content.ReadAsStreamAsync();
                     await srcMs.CopyToAsync(srcFs);
 
                     var fileInfo = new FileInfo(srcPath);
+                    IToast toast;
                     if (((int)fileInfo.Length) <= 1048576)
                     {
-                        //文件过小
+                        File.Delete(srcPath);
+                        toast = Toast.Make($"文件过小，删除：{music.Name}");
+                        await toast.Show();
+                        CanDownload = true;
+                        return;
                     }
 
                     //震动提醒
@@ -147,13 +163,12 @@ namespace MusicFree.ViewModel
                         Vibration.Default.Vibrate();
                     }
 
-                    CancellationTokenSource cancellationTokenSource = new();
-                    var toast = Toast.Make("下载完成: " + music.Name);
-                    await toast.Show(cancellationTokenSource.Token);
+                    toast = Toast.Make($"下载完成: {music.Name}");
+                    await toast.Show();
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("src download error:" + ex);
+                    Debug.WriteLine($"src download error:{ex}");
                 }
             }
 
