@@ -18,7 +18,7 @@ public partial class PlayViewModel
         _hasPlayer = false;
 
         NowMusicName = "难忘今宵";
-        PlayBtnText = "播放";
+        PlayBtnText = "▶️";
         IsPlaying = false;
 
         _audioManager = AudioManager.Current;
@@ -75,14 +75,14 @@ public partial class PlayViewModel
         if (_audioPlayer.IsPlaying)
         {
             _audioPlayer.Pause();
-            PlayBtnText = "播放";
+            PlayBtnText = "▶️";
         }
         else
         {
             NowMusicName = musicName;
             Debug.WriteLine("playing...");
             _audioPlayer.Play();
-            PlayBtnText = "暂停";
+            PlayBtnText = "⏸️";
         }
 
         IsPlaying = !IsPlaying;
