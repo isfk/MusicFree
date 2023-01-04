@@ -25,7 +25,7 @@ namespace MusicFree.ViewModel
 
         public MainViewModel()
         {
-            MusicName = "难忘今宵";
+            MusicName = "外婆的歌谣";
             MusicPath = string.Empty;
             SearchBtnText = "搜索";
             CanDownload = true;
@@ -33,11 +33,10 @@ namespace MusicFree.ViewModel
             ShowMusics = false;
 
             Musics = new ObservableCollection<Music>();
-            // MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
-            MusicPath = $"{FileSystem.Current.AppDataDirectory}/";
+            MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
 
 #if ANDROID
-            // MusicPath = $"{FileSystem.Current.AppDataDirectory}/";
+            MusicPath = $"{Android.OS.Environment.ExternalStorageDirectory.AbsolutePath}/Music/";
 #endif
         }
 

@@ -9,17 +9,28 @@
         <viewmodel:PlayViewModel />
     </ContentPage.BindingContext>
     <toolkit:DockLayout>
-        <Grid ColumnDefinitions="*,*,*" toolkit:DockLayout.DockPosition="Bottom" HeightRequest="70">
-            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏪️"></Button>
-            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏩️" Grid.Column="2"></Button>
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="*, *" toolkit:DockLayout.DockPosition="Bottom" HeightRequest="100">
+            <Label Text="{Binding NowMusicNameText}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="AliceBlue"/>
+            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏪️" Grid.Row="1" Grid.Column="0"></Button>
+            <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="⏩️" Grid.Row="1" Grid.Column="2"></Button>
             <Button BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Text="{Binding PlayBtnText}"
-                    Command="{Binding PlayCommand}" Grid.Column="1">
+                    Command="{Binding PlayCommand}"  Grid.Row="1" Grid.Column="1">
             </Button>
         </Grid>
-        <Label Text="{Binding NowMusicNameText}" HorizontalTextAlignment="Center" Margin="10, 20" />
+         
+        <CollectionView ItemsSource="{Binding LocalMusics}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10"
+                          Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
+                                                  CommandParameter="{x:Binding Name}"/>
+                        </Grid.GestureRecognizers>
+                        <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
+                     </Grid>
+                 </DataTemplate>
+             </CollectionView.ItemTemplate>
+         </CollectionView>
     </toolkit:DockLayout>
-
-    <!-- <ContentPage.Content> -->
-    <!--     <Label Text="{Binding NowMusicName}" /> -->
-    <!-- </ContentPage.Content> -->
 </ContentPage>

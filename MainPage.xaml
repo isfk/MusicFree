@@ -32,15 +32,16 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
+                            <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
                             <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
                                 <Label Text="{x:Binding Artist[0]}" />
                                 <Label Text=" - " />
                                 <Label Text="{x:Binding Album.Name}" />
                             </HorizontalStackLayout>
 
-                            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                            <HorizontalStackLayout Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                                    HorizontalOptions="End">
                                 <Button Text="下载" WidthRequest="60"
                                         IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=CanDownload}"
