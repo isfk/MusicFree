@@ -21,7 +21,7 @@ partial class PlayViewModel
 
         NowMusicName = "";
         PlayBtnImg = "play_fill.png";
-        IsPlaying = false;
+        IsRefreshing = false;
         MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
 
 #if ANDROID
@@ -30,7 +30,7 @@ partial class PlayViewModel
 
         _audioManager = AudioManager.Current;
 
-        LocalMusics = new List<LocalMusic>();
+        LocalMusics = new ObservableCollection<LocalMusic>();
         var root = new DirectoryInfo(MusicPath);
         var files = root.GetFiles();
         foreach (var file in files)
@@ -51,8 +51,8 @@ partial class PlayViewModel
 
     [ObservableProperty] private string _musicPath;
     [ObservableProperty] private string _playBtnImg;
-    [ObservableProperty] private bool _isPlaying;
-    [ObservableProperty] List<LocalMusic> _localMusics;
+    [ObservableProperty] private bool _isRefreshing;
+    [ObservableProperty] ObservableCollection<LocalMusic> _localMusics;
 
     public string NowMusicNameText => string.IsNullOrWhiteSpace(NowMusicName) ? "" : $"正在播放: {NowMusicName.Replace(".mp3","")}";
 
@@ -123,7 +123,29 @@ partial class PlayViewModel
             _audioPlayer.Play();
             PlayBtnImg = "stop.png";
         }
+    }
 
-        IsPlaying = !IsPlaying;
+    [RelayCommand]
+    async void Refresh()
+    {
+        IsRefreshing = true;
+        await Task.Delay(1);
+        LocalMusics.Clear();
+
+        var root = new DirectoryInfo(MusicPath);
+        var files = root.GetFiles();
+        foreach (var file in files)
+        {
+            Debug.WriteLine($"{file.Name}");
+            if (!file.Name.EndsWith(".mp3"))
+            {
+                continue;
+            }
+            LocalMusics.Add(new LocalMusic()
+            {
+                Name = file.Name.Replace(".mp3", ""),
+            });
+        }
+        IsRefreshing = false;
     }
 }

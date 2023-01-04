@@ -15,20 +15,22 @@
             <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit" />
             <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="1" Source="{Binding PlayBtnImg}" Aspect="AspectFit" Command="{Binding PlayCommand}" />
         </Grid>
-        <CollectionView ItemsSource="{Binding LocalMusics}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10"
+        <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding LocalMusics}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10"
                         Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
                                                 CommandParameter="{x:Binding Name}"/>
-                        </Grid.GestureRecognizers>
-                        <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                            </Grid.GestureRecognizers>
+                            <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </toolkit:DockLayout>
     
 </ContentPage>
