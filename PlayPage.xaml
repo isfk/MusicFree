@@ -9,21 +9,28 @@
         <viewmodel:PlayViewModel />
     </ContentPage.BindingContext>
     <toolkit:DockLayout Padding="10">
-        <Grid ColumnDefinitions="*,*,*" RowDefinitions="*, *" toolkit:DockLayout.DockPosition="Bottom" HeightRequest="100">
-            <Label Text="{Binding NowMusicNameText}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="AliceBlue"/>
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="0" Source="backward_fill.png" Aspect="AspectFit" />
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit" />
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50" Grid.Row="1" Grid.Column="1" Source="{Binding PlayBtnImg}" Aspect="AspectFit" Command="{Binding PlayCommand}" />
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="*, *" toolkit:DockLayout.DockPosition="Bottom"
+              HeightRequest="100">
+            <Label Text="{Binding NowMusicNameText}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3"
+                   HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="AliceBlue" />
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+                         Grid.Row="1" Grid.Column="0" Source="backward_fill.png" Aspect="AspectFit" />
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+                         Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit" />
+            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+                         Grid.Row="1" Grid.Column="1" Source="{Binding PlayBtnImg}" Aspect="AspectFit"
+                         Command="{Binding PlayCommand}" CommandParameter="{Binding NowLocalMusic}" />
         </Grid>
         <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
             <CollectionView ItemsSource="{Binding LocalMusics}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid BackgroundColor="AliceBlue" Margin="0, 0, 0, 10"
-                        Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
+                              Padding="{OnPlatform MacCatalyst='10', WinUI='10', Default='10'}" RowSpacing="10">
                             <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
-                                                CommandParameter="{x:Binding Name}"/>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:PlayViewModel}}, Path=PlayCommand}"
+                                    CommandParameter="{x:Binding .}" />
                             </Grid.GestureRecognizers>
                             <Label Text="{x:Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="0" />
                         </Grid>
@@ -32,5 +39,5 @@
             </CollectionView>
         </RefreshView>
     </toolkit:DockLayout>
-    
+
 </ContentPage>

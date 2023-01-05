@@ -10,9 +10,10 @@
         public List<string> Artist { get; set; }
         public Album Album { get; set; }
     }
-    
+
     struct LocalMusic
     {
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 
