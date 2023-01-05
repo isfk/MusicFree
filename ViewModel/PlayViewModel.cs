@@ -13,7 +13,6 @@ partial class PlayViewModel
 {
     private readonly IAudioManager _audioManager;
     private IAudioPlayer _audioPlayer;
-    private bool _hasPlayer;
     private Task _loopTask;
 
     private CancellationTokenSource _cts;
@@ -22,8 +21,9 @@ partial class PlayViewModel
 
     public PlayViewModel()
     {
+        GetPermission();
+
         _cts = new CancellationTokenSource();
-        _hasPlayer = false;
 
         NowLocalMusic = new LocalMusic()
         {
@@ -33,32 +33,18 @@ partial class PlayViewModel
 
         PlayBtnImg = "play_fill.png";
         IsRefreshing = false;
-        IsChecking = false;
         MusicPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)}/";
+
+        _audioManager = AudioManager.Current;
 
 #if ANDROID
         if (Android.OS.Environment.ExternalStorageDirectory != null)
             MusicPath = $"{Android.OS.Environment.ExternalStorageDirectory.AbsolutePath}/Music/";
 #endif
 
-        _audioManager = AudioManager.Current;
-
+        // 加载歌曲需要在目录确定之后
         LocalMusics = new ObservableCollection<LocalMusic>();
-        var root = new DirectoryInfo(MusicPath);
-        var files = root.GetFiles();
-        for (var i = 0; i < files.Length; i++)
-        {
-            if (!files[i].Name.EndsWith(".mp3"))
-            {
-                continue;
-            }
-
-            LocalMusics.Add(new LocalMusic()
-            {
-                Id = i,
-                Name = files[i].Name.Replace(".mp3", ""),
-            });
-        }
+        LoadLocalMusics();
     }
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(NowMusicNameText))]
@@ -67,7 +53,6 @@ partial class PlayViewModel
     [ObservableProperty] private string _musicPath;
     [ObservableProperty] private string _playBtnImg;
     [ObservableProperty] private bool _isRefreshing;
-    [ObservableProperty] private bool _isChecking;
     [ObservableProperty] ObservableCollection<LocalMusic> _localMusics;
 
     public string NowMusicNameText =>
@@ -76,23 +61,11 @@ partial class PlayViewModel
     [RelayCommand]
     async void Play(LocalMusic music)
     {
-        Debug.WriteLine($"music Id: {music.Id}, Name: {music.Name}");
-        if (DeviceInfo.Current.Platform == DevicePlatform.Android)
-        {
-            PermissionStatus status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
-            if (status == PermissionStatus.Denied)
-            {
-                var toast = Toast.Make("请给我媒体权限");
-                await toast.Show();
-                status = await Permissions.RequestAsync<Permissions.StorageWrite>();
-                if (status == PermissionStatus.Granted)
-                {
-                    Debug.WriteLine("授权成功");
-                }
-            }
-        }
-
-        if (music.Id < 0)
+        var switchMusic = music.Id != NowLocalMusic.Id;
+        
+        // 设置当前播放的歌曲
+        NowLocalMusic = music;
+        if (NowLocalMusic.Id == -1 || string.IsNullOrWhiteSpace(NowLocalMusic.Name))
         {
             if (LocalMusics.Count == 0)
             {
@@ -102,76 +75,49 @@ partial class PlayViewModel
                 return;
             }
 
-            if (!_hasPlayer)
-            {
-                _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{LocalMusics[0].Name}.mp3"));
-                _hasPlayer = true;
+            NowLocalMusic = LocalMusics[0];
+        }
 
-                NowLocalMusic = new LocalMusic()
-                {
-                    Id = 0,
-                    Name = LocalMusics[0].Name,
-                };
-            }
+        // 判断文件是否存在
+        if (!File.Exists($"{MusicPath}{NowLocalMusic.Name}.mp3"))
+        {
+            if (Application.Current == null) return;
+            Debug.Assert(Application.Current.MainPage != null, "Application.Current.MainPage != null");
+            await Application.Current.MainPage.DisplayAlert("提示", "歌曲不存在", "ok");
+            return;
+        }
 
-            Debug.WriteLine($"===== {_audioPlayer.IsPlaying}");
+        // 列表点个(切歌)
+        if (switchMusic)
+        {
+            _audioPlayer?.Stop();
+            _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{NowLocalMusic.Name}.mp3"));
+            _audioPlayer.Play();
+            _playStatus = true;
+            PlayBtnImg = "stop.png";
+            return;
+        }
 
-            if (_audioPlayer.IsPlaying)
-            {
-                _cts.Cancel();
-                _audioPlayer.Pause();
-                _playStatus = false;
-                PlayBtnImg = "play_fill.png";
-            }
-            else
-            {
-                Debug.WriteLine("playing...");
-                _audioPlayer.Play();
-                _playStatus = true;
-                PlayBtnImg = "stop.png";
-            }
+        // 获取播放器
+        _audioPlayer ??= _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{NowLocalMusic.Name}.mp3"));
+
+        // 切换播放状态
+        if (_playStatus)
+        {
+            _audioPlayer.Pause();
+            _playStatus = false;
+            PlayBtnImg = "play_fill.png";
         }
         else
         {
-            if (!File.Exists($"{MusicPath}{music.Name}.mp3"))
-            {
-                Debug.WriteLine("文件不存在");
-                if (Application.Current == null) return;
-                Debug.Assert(Application.Current.MainPage != null, "Application.Current.MainPage != null");
-                await Application.Current.MainPage.DisplayAlert("提示", "歌曲不存在", "ok");
-                return;
-            }
-
-            if (_hasPlayer)
-            {
-                if (_playStatus)
-                {
-                    _audioPlayer.Pause();
-                    _playStatus = false;
-                    PlayBtnImg = "play_fill.png";
-                }
-                else
-                {
-                    _audioPlayer.Play();
-                    _playStatus = true;
-                    PlayBtnImg = "stop.png";
-                }
-            }
-            else
-            {
-                _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{music.Name}.mp3"));
-                _hasPlayer = true;
-                NowLocalMusic = music;
-                Debug.WriteLine("playing...");
-                _audioPlayer.Play();
-                _playStatus = true;
-                PlayBtnImg = "stop.png";
-            }
+            _audioPlayer.Play();
+            _playStatus = true;
+            PlayBtnImg = "stop.png";
         }
 
-        _cts.Cancel();
-        _cts = new CancellationTokenSource();
-        await CheckPlayStatus();
+        // _cts.Cancel();
+        // _cts = new CancellationTokenSource();
+        // await CheckPlayStatus();
     }
 
     async Task CheckPlayStatus()
@@ -228,28 +174,48 @@ partial class PlayViewModel
     }
 
     [RelayCommand]
-    async void Refresh()
+    void Refresh()
     {
         IsRefreshing = true;
-        await Task.Delay(1);
         LocalMusics.Clear();
+        LoadLocalMusics();
+        IsRefreshing = false;
+    }
 
+    void LoadLocalMusics()
+    {
         var root = new DirectoryInfo(MusicPath);
         var files = root.GetFiles();
-        foreach (var file in files)
+        for (var i = 0; i < files.Length; i++)
         {
-            Debug.WriteLine($"{file.Name}");
-            if (!file.Name.EndsWith(".mp3"))
+            if (!files[i].Name.EndsWith(".mp3"))
             {
                 continue;
             }
 
             LocalMusics.Add(new LocalMusic()
             {
-                Name = file.Name.Replace(".mp3", ""),
+                Id = i,
+                Name = files[i].Name.Replace(".mp3", ""),
             });
         }
+    }
 
-        IsRefreshing = false;
+    async void GetPermission()
+    {
+        if (DeviceInfo.Current.Platform == DevicePlatform.Android)
+        {
+            PermissionStatus status = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+            if (status == PermissionStatus.Denied)
+            {
+                var toast = Toast.Make("请给我媒体权限");
+                await toast.Show();
+                status = await Permissions.RequestAsync<Permissions.StorageWrite>();
+                if (status == PermissionStatus.Granted)
+                {
+                    Debug.WriteLine("授权成功");
+                }
+            }
+        }
     }
 }
