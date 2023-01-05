@@ -13,9 +13,9 @@ partial class PlayViewModel
 {
     private readonly IAudioManager _audioManager;
     private IAudioPlayer _audioPlayer;
-    private Task _loopTask;
-
     private CancellationTokenSource _cts;
+    private Task _loopTask;
+    private bool _another = false;
 
     private bool _playStatus;
 
@@ -62,7 +62,7 @@ partial class PlayViewModel
     async void Play(LocalMusic music)
     {
         var switchMusic = music.Id != NowLocalMusic.Id;
-        
+
         // 设置当前播放的歌曲
         NowLocalMusic = music;
         if (NowLocalMusic.Id == -1 || string.IsNullOrWhiteSpace(NowLocalMusic.Name))
@@ -87,90 +87,79 @@ partial class PlayViewModel
             return;
         }
 
+        _cts.Cancel();
         // 列表点个(切歌)
         if (switchMusic)
         {
-            _audioPlayer?.Stop();
+            _audioPlayer = null;
+            // _audioPlayer?.Stop();
             _audioPlayer = _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{NowLocalMusic.Name}.mp3"));
             _audioPlayer.Play();
             _playStatus = true;
             PlayBtnImg = "stop.png";
-            return;
-        }
-
-        // 获取播放器
-        _audioPlayer ??= _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{NowLocalMusic.Name}.mp3"));
-
-        // 切换播放状态
-        if (_playStatus)
-        {
-            _audioPlayer.Pause();
-            _playStatus = false;
-            PlayBtnImg = "play_fill.png";
+            _another = true;
         }
         else
         {
-            _audioPlayer.Play();
-            _playStatus = true;
-            PlayBtnImg = "stop.png";
+            _another = false;
+            // 获取播放器
+            _audioPlayer ??= _audioManager.CreatePlayer(File.OpenRead($"{MusicPath}{NowLocalMusic.Name}.mp3"));
+
+            // 切换播放状态
+            if (_playStatus)
+            {
+                _audioPlayer.Pause();
+                _playStatus = false;
+                PlayBtnImg = "play_fill.png";
+            }
+            else
+            {
+                _audioPlayer.Play();
+                _playStatus = true;
+                PlayBtnImg = "stop.png";
+            }
         }
 
-        // _cts.Cancel();
-        // _cts = new CancellationTokenSource();
-        // await CheckPlayStatus();
+        _cts = new CancellationTokenSource();
+        await CheckPlayStatus();
     }
 
-    async Task CheckPlayStatus()
+    private async Task CheckPlayStatus()
     {
+        Debug.WriteLine($"another {_another} {DateTime.Now}");
         try
         {
-            if (_loopTask is not null)
-            {
-                Debug.WriteLine($"play status 1: {_playStatus}");
-                if (!_playStatus)
-                {
-                    _loopTask = null;
-                    return;
-                }
-
-                Debug.WriteLine($"play status 2: {_playStatus}");
-                await _loopTask;
-                if (_loopTask.Status == TaskStatus.Running)
-                {
-                    return;
-                }
-            }
+            Debug.WriteLine($"正在播放 1 {NowLocalMusic.Name} {DateTime.Now}");
 
             _loopTask = Task.Run(() =>
             {
+                Debug.WriteLine($"正在播放 2 {NowLocalMusic.Name} {DateTime.Now}");
                 while (_audioPlayer.IsPlaying)
                 {
-                    Thread.Sleep(1000);
-                    Debug.WriteLine(
-                        $"{NowLocalMusic.Id}:{NowLocalMusic.Name}:{_audioPlayer.CurrentPosition}:{_audioPlayer.Duration} ...播放中: " +
-                        DateTime.Now);
-
                     if (_cts.IsCancellationRequested)
                     {
-                        Debug.WriteLine($"{NowLocalMusic.Id}:{NowLocalMusic.Name} 取消任务");
+                        Debug.WriteLine("取消了.....");
                         break;
                     }
+
+                    Debug.WriteLine($"正在播放 {NowLocalMusic.Name} {DateTime.Now}");
+                    Thread.Sleep(1000);
                 }
 
-                Debug.WriteLine("next...");
+                Debug.WriteLine($"停止播放了.......... {_another}");
+                if (!_another) return;
+                Debug.WriteLine($"another {true}..........");
                 Play(NowLocalMusic.Id == LocalMusics.Count - 1
                     ? LocalMusics[0]
                     : LocalMusics[NowLocalMusic.Id + 1]);
             }, _cts.Token);
+
             await _loopTask;
         }
-        catch (OperationCanceledException e)
+        catch (Exception e)
         {
-            Debug.WriteLine($"任务取消");
             Console.WriteLine(e);
         }
-
-        Debug.WriteLine(DateTime.Now);
     }
 
     [RelayCommand]
@@ -182,7 +171,7 @@ partial class PlayViewModel
         IsRefreshing = false;
     }
 
-    void LoadLocalMusics()
+    private void LoadLocalMusics()
     {
         var root = new DirectoryInfo(MusicPath);
         var files = root.GetFiles();
@@ -201,7 +190,7 @@ partial class PlayViewModel
         }
     }
 
-    async void GetPermission()
+    private async void GetPermission()
     {
         if (DeviceInfo.Current.Platform == DevicePlatform.Android)
         {
@@ -214,6 +203,7 @@ partial class PlayViewModel
                 if (status == PermissionStatus.Granted)
                 {
                     Debug.WriteLine("授权成功");
+                    LoadLocalMusics();
                 }
             }
         }
