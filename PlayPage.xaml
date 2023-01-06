@@ -11,13 +11,18 @@
     <toolkit:DockLayout Padding="10">
         <Grid ColumnDefinitions="*,*,*" RowDefinitions="*, *" toolkit:DockLayout.DockPosition="Bottom"
               HeightRequest="100">
-            <Label Text="{Binding NowMusicNameText}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3"
+            <Label Text="{Binding NowLocalMusic.Name}" HeightRequest="40" Grid.Row="0" Grid.ColumnSpan="3"
                    HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="AliceBlue" />
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
-                         Grid.Row="1" Grid.Column="0" Source="backward_fill.png" Aspect="AspectFit" />
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
-                         Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit" />
-            <ImageButton BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+            <ImageButton IsEnabled="{Binding PlayBtnEnabled}"
+                         BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+                         Grid.Row="1" Grid.Column="0" Source="backward_fill.png" Aspect="AspectFit"
+                         Command="{Binding PrePlayCommand}" />
+            <ImageButton IsEnabled="{Binding PlayBtnEnabled}"
+                         BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
+                         Grid.Row="1" Grid.Column="2" Source="play_forward_fill.png" Aspect="AspectFit"
+                         Command="{Binding NextPlayCommand}" />
+            <ImageButton IsEnabled="{Binding PlayBtnEnabled}"
+                         BackgroundColor="AliceBlue" HeightRequest="50" WidthRequest="50" CornerRadius="50"
                          Grid.Row="1" Grid.Column="1" Source="{Binding PlayBtnImg}" Aspect="AspectFit"
                          Command="{Binding PlayCommand}" CommandParameter="{Binding NowLocalMusic}" />
         </Grid>
